@@ -1,10 +1,11 @@
 <style>
     .primary-color { color: #6db33f; }
     .center { text-align: center; }
+    .jumbo { font-size: 80px }
 </style>
 
 ![spring-framework](logo.svg)
-# <span class="primary-color">Execução assíncrona (:twisted_rightwards_arrows:) e agendada (:alarm_clock:) de tarefas</span>
+# <span class="primary-color jumbo">Execução<br>assíncrona (:twisted_rightwards_arrows: <span style="color: #80ea6e; font-weight: 700">@Async</span>)<br>e agendada (:alarm_clock: <span style="color: #80ea6e; font-weight: 700">@Scheduled</span>) de tarefas</span>
 
 <div class="center">
 
