@@ -4,7 +4,7 @@
     .jumbo { font-size: 80px }
 </style>
 
-![spring-framework](logo.svg)
+![spring-framework](../spring-logo.svg)
 # <span class="primary-color jumbo">Execução<br>assíncrona (:twisted_rightwards_arrows: <span style="color: #80ea6e; font-weight: 700">@Async</span>)<br>e agendada (:alarm_clock: <span style="color: #80ea6e; font-weight: 700">@Scheduled</span>) de tarefas</span>
 
 <div class="center">
