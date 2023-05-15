@@ -21,5 +21,6 @@ plugins {
 rootProject.name = 'aula-spring-framework'
 include(
     'utilities', 
-    'async-task-execution'
+    'async-task-execution',
+    'scheduled-task-execution'
 )

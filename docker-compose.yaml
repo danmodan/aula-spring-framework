@@ -1,0 +1,13 @@
+services:
+
+  async-task-execution:
+    image: openjdk:17
+    volumes:
+      - $PWD/async-task-execution/build/libs/async-task-execution-all.jar:/temp/app.jar
+    entrypoint: java -jar /temp/app.jar
+
+  scheduled-task-execution:
+    image: openjdk:17
+    volumes:
+      - $PWD/scheduled-task-execution/build/libs/scheduled-task-execution-all.jar:/temp/app.jar
+    entrypoint: java -jar /temp/app.jar
