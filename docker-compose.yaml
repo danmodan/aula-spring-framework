@@ -1,3 +1,8 @@
+networks:
+  default:
+    external: true
+    name: bubble
+
 services:
 
   async-task-execution:
@@ -11,3 +16,6 @@ services:
     volumes:
       - $PWD/scheduled-task-execution/build/libs/scheduled-task-execution-all.jar:/temp/app.jar
     entrypoint: java -jar /temp/app.jar
+    environment:
+      - JEDIS_HOSTNAME=redis
+      - JEDIS_PORT=6379
