@@ -202,8 +202,8 @@ Future<String> processTaskInParallel(int arg) {
     - Para desabilitar uma tarefa, usar a expressão `ScheduledTaskRegistrar`.`CRON_DISABLED`.
 - `IntervalTask`
   - Define uma tarefa (`java.lang.Runnable`) e seu intervalo de `java.time.Duration` entre os disparos.
-    - Em tarefas de cadência `fixed delay`, o intervalo de `java.time.Duration` se inicia a partir do **término** (`TriggerContext`.`lastActualExecution`) da execução anterior.
-    - Em tarefas de cadência `fixed rate`, o intervalo de `java.time.Duration` se inicia a partir do **início** (`TriggerContext`.`lastActualExecution`) da execução anterior.
+    - Em tarefas de cadência `fixed delay`, o intervalo de `java.time.Duration` se inicia a partir do `TriggerContext`.`lastCompletion` da execução anterior.
+    - Em tarefas de cadência `fixed rate`, o intervalo de `java.time.Duration` se inicia a partir do `TriggerContext`.`lastActualExecution` da execução anterior.
   - É possível configurar um delay inicial antes do compasso começar.
   - Existe a `PeriodicTrigger`, mas a `IntervalTask` nem a usa.
 - `Trigger`

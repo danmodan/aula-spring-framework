@@ -18,8 +18,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {
 
-    // default SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor();
-    //         taskExecutor.setConcurrencyLimit(SimpleAsyncTaskExecutor.UNBOUNDED_CONCURRENCY);
+    // default SimpleAsyncTaskExecutor.setConcurrencyLimit(SimpleAsyncTaskExecutor.UNBOUNDED_CONCURRENCY);
     @Bean
     @Override
     public Executor getAsyncExecutor() {
@@ -41,9 +40,15 @@ public class AsyncConfig implements AsyncConfigurer {
     // default SimpleAsyncUncaughtExceptionHandler
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (ex, method, params) -> Util.log(
-            String.format("❌ %s (%s) - [ERROR] %s", method, Arrays.toString(params), ex.getMessage())
-        );
+        return (ex, method, params) -> 
+            Util.log(
+                String.format(
+                    "❌ %s (%s) - [ERROR] %s", 
+                    method, 
+                    Arrays.toString(params), 
+                    ex.getMessage()
+                )
+            );
     }
 
     @Bean("specificExecutor")

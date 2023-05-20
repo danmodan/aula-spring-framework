@@ -8,7 +8,7 @@ public class Util {
     public static void log(String msg) {
 
         System.out.println(
-            "⏰ " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + 
+            "🕑 " + LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + 
             " - 🧵 " + Thread.currentThread().getName() +
             " - " + msg
         );

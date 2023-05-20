@@ -9,4 +9,6 @@ plugins {
 }
 
 dependencies {
+    api 'redis.clients:jedis:4.4.1'
+    api 'org.springframework:spring-context:6.0.8'
 }
