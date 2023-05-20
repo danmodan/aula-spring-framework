@@ -14,7 +14,7 @@ public class AsyncTaskService {
     private int process(long millis) {
         Util.log("👉 fazendo tarefa");
         Util.sleep(millis);
-        return new Random().nextInt(100);
+        return new Random().nextInt(100) + 1;
     }
 
     @Async

@@ -20,12 +20,15 @@ public class AsyncTaskExecutionApp {
 
         for (int i = 0; i < 3; i++) {
 
+            service.processAsyncInSpecificExecutor(millis);
             service.processAsync(millis);
             service.processFailedAsync(millis);
-            service.processAsyncInSpecificExecutor(millis);
         }
 
-        // Util.log("✅ resultado = " + service.processAsyncAndGet(millis).get());
+        Util.log("✅ resultado = " + service.processAsyncAndGet(millis).get());
+
+        service.processAsyncAndGet(millis)
+            .thenAccept(result -> Util.log("✅ resultado = " + result));
 
         Util.log("🏁 Thread 'main' terminou");
     }
