@@ -16,22 +16,22 @@ title: Tarefas em um pool de Threads
 flowchart TB
     subgraph executor["ExecutorService"]
         subgraph queue["Fila de tarefas"]
-            t5(("&#128293;"))
-            t4(("&#128293;"))
-            t3(("&#128168;"))
-            t2(("&#128168;"))
-            t1(("&#128168;"))
+            t5(("#128293;"))
+            t4(("#128293;"))
+            t3(("#128168;"))
+            t2(("#128168;"))
+            t1(("#128168;"))
         end
         t3 --> |"Runnable.run()"|T2
         t2 --> |"Runnable.run()"|T1
         t1 --> |"Runnable.run()"|T0
         subgraph threads["Pool de Threads"]
-            T0[\"&#129525;&#128293;"/]
-            T1[\"&#129525;&#128293;"/]
-            T2[\"&#129525;&#128293;"/]
+            T0[\"#129525;#128293;"/]
+            T1[\"#129525;#128293;"/]
+            T2[\"#129525;#128293;"/]
         end
     end
-    t8(("&#128293;")) --- t7(("&#128293;")) --- t6(("&#128293;")) -->|"Executor.execute(Runnable)"|queue
+    t8(("#128293;")) --- t7(("#128293;")) --- t6(("#128293;")) -->|"Executor.execute(Runnable)"|queue
 ```
 </div>
 
@@ -47,27 +47,27 @@ flowchart TB
 title: Diagrama de classe de executores JDK e Spring
 ---
 classDiagram
-    class Executor["&#9749;<br>Executor"]
+    class Executor["#9749;<br>Executor"]
     <<Interface>> Executor
     Executor: +execute(runnable)
 
-    class ThreadPoolExecutor["&#9749; &#128256;<br>ThreadPoolExecutor"]
+    class ThreadPoolExecutor["#9749; #128256;<br>ThreadPoolExecutor"]
 
-    class ScheduledExecutorService["&#9749; &#9200;<br>ScheduledExecutorService"]
+    class ScheduledExecutorService["#9749; #9200;<br>ScheduledExecutorService"]
     <<Interface>> ScheduledExecutorService
 
-    class TaskExecutor["&#127793; &#128256;<br>TaskExecutor"]
+    class TaskExecutor["#127793; #128256;<br>TaskExecutor"]
     <<Interface>> TaskExecutor
     TaskExecutor: +execute(runnable)
 
-    class TaskScheduler["&#127793; &#9200;<br>TaskScheduler"]
+    class TaskScheduler["#127793; #9200;<br>TaskScheduler"]
     <<Interface>> TaskScheduler
     TaskScheduler: +schedule(runnable, trigger) ScheduledFuture
 
-    class ThreadPoolTaskExecutor["&#127793; &#128256;<br>ThreadPoolTaskExecutor"]
+    class ThreadPoolTaskExecutor["#127793; #128256;<br>ThreadPoolTaskExecutor"]
     ThreadPoolTaskExecutor: -ThreadPoolExecutor threadPoolExecutor
 
-    class ThreadPoolTaskScheduler["&#127793; &#9200;<br>ThreadPoolTaskScheduler"]
+    class ThreadPoolTaskScheduler["#127793; #9200;<br>ThreadPoolTaskScheduler"]
     ThreadPoolTaskScheduler: -ScheduledExecutorService scheduledExecutor
 
     Executor <|.. ThreadPoolExecutor
