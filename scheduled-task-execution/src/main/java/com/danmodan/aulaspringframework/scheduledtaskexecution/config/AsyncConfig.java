@@ -3,7 +3,7 @@ package com.danmodan.aulaspringframework.scheduledtaskexecution.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-// @EnableAsync
+@EnableAsync
 @Configuration
 public class AsyncConfig {
 

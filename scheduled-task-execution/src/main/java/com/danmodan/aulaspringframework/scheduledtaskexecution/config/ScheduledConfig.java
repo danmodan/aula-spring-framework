@@ -44,19 +44,23 @@ public class ScheduledConfig implements SchedulingConfigurer {
 
         /** Configurar TaskScheduler/Executor */
 
-        // configExecutor(taskRegistrar);
+        configExecutor(taskRegistrar);
 
         /** 
+         * 
+         * void taskRegistrar.add*..*Task
+         * ScheduledTask taskRegistrar.schedule*..*Task
+         * 
          * Adicionar/agenda tarefas
          * (org.springframework.scheduling.config.Task)
          * e seus respectivos gatilhos
          * (org.springframework.scheduling.Trigger)
          */
 
-        // setupCronTasks(taskRegistrar);
-        // setupFixedRateTasks(taskRegistrar);
-        // setupFixedDelayTasks(taskRegistrar);
-        // setupCustomTriggerTasks(taskRegistrar);
+        setupCronTasks(taskRegistrar);
+        setupFixedRateTasks(taskRegistrar);
+        setupFixedDelayTasks(taskRegistrar);
+        setupCustomTriggerTasks(taskRegistrar);
     }
 
     /** Configurar TaskScheduler/Executor */
@@ -69,7 +73,7 @@ public class ScheduledConfig implements SchedulingConfigurer {
         //     .setScheduler(scheduledExecutor());
     }
 
-    // @Bean
+    @Bean
     public TaskScheduler taskScheduler() {
 
         // Default 1 Thread só
@@ -77,7 +81,7 @@ public class ScheduledConfig implements SchedulingConfigurer {
         executor.setPoolSize(20);
         executor.setThreadNamePrefix("taskScheduler-");
         executor.setErrorHandler(t -> Util.log(String.format("❌ [ERROR] %s", t.getMessage())));
-        executor.afterPropertiesSet();
+        // executor.afterPropertiesSet();
         return executor;
     }
 
@@ -101,8 +105,12 @@ public class ScheduledConfig implements SchedulingConfigurer {
         // ScheduledTaskRegistrar.CRON_DISABLED
         String cron = "*/1 * * * * *";
 
+        // --
+
         taskRegistrar
             .addCronTask(new CronTask(service::processEvery1Sec, cron));
+
+        // --
 
         taskRegistrar
             .addTriggerTask(
@@ -112,8 +120,12 @@ public class ScheduledConfig implements SchedulingConfigurer {
                 )
             );
 
+        // --
+
         ScheduledTask scheduledCronTask = taskRegistrar
             .scheduleCronTask(new CronTask(service::processEvery1Sec, cron));
+
+        // --
 
         scheduledCronTask = taskRegistrar
             .scheduleTriggerTask(
@@ -138,6 +150,8 @@ public class ScheduledConfig implements SchedulingConfigurer {
 
         Duration oneSecondDuration = Duration.ofSeconds(1);
 
+        // --
+
         taskRegistrar
             .addFixedRateTask(
                 new IntervalTask(
@@ -147,11 +161,15 @@ public class ScheduledConfig implements SchedulingConfigurer {
                 )
             );
 
+        // --
+
         PeriodicTrigger rateTrigger = new PeriodicTrigger(oneSecondDuration);
         rateTrigger.setFixedRate(true);
         rateTrigger.setInitialDelay(oneSecondDuration);
         taskRegistrar
             .addTriggerTask(new TriggerTask(service::processAt1SecRate, rateTrigger));
+
+        // --
 
         ScheduledTask fixedRateTask = taskRegistrar
             .scheduleFixedRateTask(
@@ -161,6 +179,8 @@ public class ScheduledConfig implements SchedulingConfigurer {
                     oneSecondDuration
                 )
             );
+
+        // --
 
         taskRegistrar
             .addTriggerTask(
@@ -197,13 +217,19 @@ public class ScheduledConfig implements SchedulingConfigurer {
 
         Duration oneSecondDuration = Duration.ofSeconds(1);
 
+        // --
+
         taskRegistrar
             .addFixedDelayTask(new IntervalTask(service::processAt1SecDelay, oneSecondDuration));
+
+        // --
 
         PeriodicTrigger delayTrigger = new PeriodicTrigger(oneSecondDuration);
         delayTrigger.setFixedRate(false);
         taskRegistrar
             .addTriggerTask(new TriggerTask(service::processAt1SecDelay, delayTrigger));
+
+        // --
 
         ScheduledTask fixedDelayTask = taskRegistrar
             .scheduleFixedDelayTask(
@@ -213,6 +239,8 @@ public class ScheduledConfig implements SchedulingConfigurer {
                     Duration.ofSeconds(0)
                 )
             );
+
+        // --
 
         taskRegistrar
             .addTriggerTask(
@@ -246,6 +274,50 @@ public class ScheduledConfig implements SchedulingConfigurer {
 
     private void setupCustomTriggerTasks(ScheduledTaskRegistrar taskRegistrar) {
 
+        flexDelayTrigger(taskRegistrar);
+
+        distributedLockTrigger(taskRegistrar);
+    }
+
+    private void distributedLockTrigger(ScheduledTaskRegistrar taskRegistrar) {
+
+        LockCustomTrigger lockCustomTrigger = new LockCustomTrigger(
+                "*/3 * * * * *", 
+                ZoneId.of("America/Sao_Paulo"),
+                jedisClient);
+
+        taskRegistrar
+            .addTriggerTask(
+                new TriggerTask(
+                    () -> {
+
+                        try {
+
+                            // acquire lock
+
+                            if(!lockCustomTrigger.tryLock(10)) {
+                                return;
+                            }
+
+                            // execução da tarefa
+
+                            int result = service.process(2_000);
+                            Util.log("✅ resultado lockCustomTrigger ⏰ = " + result);
+
+                        } finally {
+
+                            // release lock
+
+                            lockCustomTrigger.unlock();
+                        }
+                    },
+                    lockCustomTrigger
+                )
+            );
+    }
+
+    private void flexDelayTrigger(ScheduledTaskRegistrar taskRegistrar) {
+
         Duration oneSecondDuration = Duration.ofSeconds(1);
 
         FlexDelayTrigger flexDelayTrigger = new FlexDelayTrigger(oneSecondDuration);
@@ -255,10 +327,10 @@ public class ScheduledConfig implements SchedulingConfigurer {
                 new TriggerTask(
                     () -> {
 
-                        // obtem resultado anterior
+                        // obtém resultado anterior
 
-                        Integer lastResult = flexDelayTrigger.getLastResult();
-                        int millis = lastResult == null ? ScheduledTaskService.DELAY : lastResult;
+                        int lastResult = flexDelayTrigger.lastResult;
+                        int millis = lastResult * 1000;
 
                         // execução da tarefa
 
@@ -267,45 +339,11 @@ public class ScheduledConfig implements SchedulingConfigurer {
 
                         // guarda resultado atual
 
-                        flexDelayTrigger.setLastResult(result * 1000); // segundos
-                        flexDelayTrigger.incrementExecutionCounter();
+                        flexDelayTrigger.lastResult = result; // milissegundos
+                        flexDelayTrigger.counter++;
                     },
                     flexDelayTrigger
                 )
             );
-
-        // LockCustomTrigger lockCustomTrigger = new LockCustomTrigger(
-        //         "*/3 * * * * *", 
-        //         ZoneId.of("America/Sao_Paulo"),
-        //         jedisClient);
-
-        // taskRegistrar
-        //     .addTriggerTask(
-        //         new TriggerTask(
-        //             () -> {
-
-        //                 try {
-
-        //                     // acquire lock
-
-        //                     if(!lockCustomTrigger.tryLock(10)) {
-        //                         return;
-        //                     }
-
-        //                     // execução da tarefa
-
-        //                     int result = service.process(5_000);
-        //                     Util.log("✅ resultado lockCustomTrigger ⏰ = " + result);
-
-        //                 } finally {
-
-        //                     // release lock
-
-        //                     lockCustomTrigger.unlock();
-        //                 }
-        //             },
-        //             lockCustomTrigger
-        //         )
-        //     );
     }
 }

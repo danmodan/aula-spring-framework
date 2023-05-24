@@ -9,8 +9,8 @@ import org.springframework.scheduling.support.PeriodicTrigger;
 
 public class FlexDelayTrigger extends PeriodicTrigger {
 
-    private int counter;
-    private Integer lastResult;
+    int counter;
+    int lastResult;
 
     public FlexDelayTrigger(Duration period) {
         super(period);
@@ -20,13 +20,13 @@ public class FlexDelayTrigger extends PeriodicTrigger {
     @Override
     public Instant nextExecution(TriggerContext triggerContext) {
 
-        if(counter >= 3) {
+        if(counter >= 4) {
             return null;
         }
 
         Instant nextExecution = super.nextExecution(triggerContext);
 
-        if(lastResult == null || lastResult < 3) {
+        if(lastResult < 3) {
 
             return nextExecution;
         }
@@ -39,17 +39,5 @@ public class FlexDelayTrigger extends PeriodicTrigger {
         //     .atZone(clock.getZone())
         //     .plusDays(1)
         //     .toInstant();
-    }
-
-    public Integer getLastResult() {
-        return lastResult;
-    }
-
-    public void setLastResult(Integer lastResult) {
-        this.lastResult = lastResult;
-    }
-
-    public void incrementExecutionCounter() {
-        this.counter++;
     }
 }
